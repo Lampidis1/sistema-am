@@ -524,6 +524,16 @@
     background:#fff;cursor:pointer;min-width:130px}
   .prog-filter-sel:focus{border-color:#5b4fcf}
 
+
+  /* Sheet load button */
+  .btn-sheet-load{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:linear-gradient(135deg,#1a7a38,#28a84e);color:#fff;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .18s;white-space:nowrap}
+  .btn-sheet-load:hover{background:linear-gradient(135deg,#155f2c,#1f8a3e);transform:translateY(-1px)}
+  .btn-sheet-load:disabled{background:#ccc;cursor:not-allowed;transform:none}
+  .btn-sheet-export{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:linear-gradient(135deg,#1557a0,#1e78d4);color:#fff;border:none;border-radius:8px;font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .18s;white-space:nowrap}
+  .btn-sheet-export:hover{background:linear-gradient(135deg,#0f3f78,#1560aa);transform:translateY(-1px)}
+  .sheet-source-badge{display:inline-flex;align-items:center;gap:5px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:7px;padding:4px 10px;font-size:.76rem;font-weight:700;color:#1a7a38}
+  .upload-divider{display:flex;align-items:center;gap:10px;color:var(--text-muted);font-size:.78rem;font-weight:600;white-space:nowrap}
+  .upload-divider::before,.upload-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 </style>
 </head>
 <body>
@@ -542,8 +552,9 @@
   </div>
   <div class="header-right">
     <span class="edited-badge" id="editedBadge">✏ Con ediciones</span>
+    <button class="btn-sheet-export" id="btnExportSheet" onclick="exportarASheetYExcel()" disabled style="font-size:.78rem;padding:7px 13px;margin-right:6px">&#9729;&#65039; Sheet + Excel</button>
     <button class="btn-download-header" id="btnDownload" onclick="downloadConsolidado()" disabled>
-      ⬇ Descargar Base Consolidada
+      ⬇ Solo Excel
     </button>
   </div>
 </header>
@@ -588,20 +599,27 @@
 <!-- UPLOAD ZONE -->
 <div class="upload-section">
   <div class="upload-label">📂 Cargar datos</div>
+  <!-- Fuente activa -->
+  <div id="sheetSourceBadge" style="display:none">
+    <span class="sheet-source-badge">&#128994; Datos cargados desde Google Sheets</span>
+    <button onclick="limpiarFuenteSheet()" style="background:none;border:none;font-size:.75rem;color:var(--text-muted);cursor:pointer;margin-left:4px">&#10005; Cambiar a Excel</button>
+  </div>
+  <!-- Botón cargar desde Sheet -->
+  <button class="btn-sheet-load" id="btnSheetLoad" onclick="cargarDesdeSheet()" title="Lee la hoja Proveedores del Google Sheet vinculado">
+    &#128196; Cargar desde Google Sheet
+  </button>
+  <div class="upload-divider">o usa Excel</div>
   <div class="upload-drop" id="dropArea">
     <input type="file" id="fileInput" multiple accept=".xlsx,.xls" onchange="handleFiles(this.files)">
     <div class="upload-icon">📊</div>
     <div>
-      <div class="upload-text-main">Arrastra archivos Excel aquí (uno por localidad)</div>
+      <div class="upload-text-main">Arrastra archivos Excel aquí</div>
       <div class="upload-text-sub">Usa la plantilla descargable · Formato .xlsx</div>
     </div>
   </div>
   <div id="fileChips" class="file-chips" style="display:none"></div>
-  <button class="btn-load" id="btnLoad" onclick="processFiles()" disabled>⚡ Cargar</button>
+  <button class="btn-load" id="btnLoad" onclick="processFiles()" disabled>⚡ Cargar Excel</button>
   <div id="uploadStatus" class="upload-status" style="display:none"></div>
-  <div class="format-hint">
-    <strong>Columnas esperadas (fila 2):</strong> N° · Contacto · RUT · Razón Social · Fantasía · RUT Empresa · <strong>Localidad</strong> · Dirección · Correo · Fono · Giro 1–4 · Descripción · Info SII · Categoría SII · Autorización
-  </div>
 </div>
 
 <!-- HERO -->
@@ -906,6 +924,7 @@ function finishLoad(newData, errors) {
   st.textContent=`✅ ${PROVEEDORES.length} proveedores cargados · ${new Set(PROVEEDORES.map(p=>p.localidad)).size} localidad(es)${errMsg}`;
   pendingFiles=[]; renderFileChips(); document.getElementById('btnLoad').disabled=true; document.getElementById('fileInput').value='';
   document.getElementById('btnDownload').disabled=false;
+  const btnES=document.getElementById('btnExportSheet'); if(btnES) btnES.disabled=false;
   initApp();
 }
 
@@ -2894,6 +2913,163 @@ function eliminarProg(idx){
   saveDB();
   renderProgramasDash();
 }
+
+// ── CARGAR PROVEEDORES DESDE GOOGLE SHEET ────────────────────────────────
+// La hoja 'Proveedores' del Sheet debe tener las mismas columnas que la plantilla v3
+// Fila 1: encabezados, Fila 2+: datos
+
+async function cargarDesdeSheet(){
+  const sheetId=DB.gsync?.sheetId||document.getElementById('gsyncId')?.value?.trim();
+  if(!sheetId){showToast('Primero conecta el Google Sheet en la barra superior','err');return;}
+  const btn=document.getElementById('btnSheetLoad');
+  if(btn){btn.disabled=true;btn.innerHTML='&#9203; Leyendo Sheet...';}
+  const st=document.getElementById('uploadStatus');
+  if(st){st.style.display='block';st.textContent='Leyendo hoja Proveedores del Sheet...';}
+  try{
+    // Leer hoja 'Proveedores' como CSV
+    const url=`https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Proveedores`;
+    const resp=await fetch(url);
+    if(!resp.ok) throw new Error('No se pudo leer el Sheet. Verifica que la hoja se llame exactamente "Proveedores" y que el Sheet sea público.');
+    const csv=await resp.text();
+    const rows=parseCSV(csv);
+    if(rows.length<2) throw new Error('La hoja Proveedores está vacía o no tiene datos.');
+    // Fila 0 = encabezados, Fila 1+ = datos
+    const dataRows=rows.slice(1).filter(r=>r.some(c=>c&&c.toString().trim()));
+    if(dataRows.length===0) throw new Error('No se encontraron proveedores en el Sheet.');
+    const newData=[];
+    dataRows.forEach(row=>{
+      const localidad=ss2(row[7])||ss2(row[6])||'';
+      const giros=[ss2(row[11]),ss2(row[12]),ss2(row[13]),ss2(row[14])].filter(Boolean);
+      const rubrosNorm=[...new Set(giros.map(g=>normRubro(g)).filter(Boolean))];
+      newData.push({
+        _id:uid(),
+        numero:ss2(row[1])||ss2(row[0])||'',
+        nombre_contacto:ss2(row[2]),
+        rut_persona:ss2(row[3]),
+        razon_social:ss2(row[4]),
+        nombre_fantasia:ss2(row[5]),
+        rut_empresa:ss2(row[6]),
+        localidad,
+        direccion:ss2(row[8]),
+        correo:ss2(row[9]),
+        fono:ss2(row[10]),
+        giros, rubrosNorm,
+        descripcion:ss2(row[15]),
+        info_sii:ss2(row[16]),
+        categoria_sii:ss2(row[17]),
+        facturar:ss2(row[18]),
+        estado:ss2(row[19])||'Activo',
+        agrupacion:ss2(row[20]),
+        servicio_am:ss2(row[21]),
+      });
+      // Cols W/X/Y (índices 22/23/24)
+      const _pid=newData[newData.length-1]._id;
+      const _hs=Math.max(0,parseInt(row[22])||0);
+      const _hd=Math.max(0,parseInt(row[23])||0);
+      const _py=ss2(row[24]);
+      if(_hs>0||_hd>0){
+        if(!DB.hoteles[_pid])DB.hoteles[_pid]={simples:0,dobles:0,contratos:[]};
+        if(_hs>0)DB.hoteles[_pid].simples=_hs;
+        if(_hd>0)DB.hoteles[_pid].dobles=_hd;
+      }
+      if(_py){
+        const _progs=_py.split('|').map(s=>s.trim()).filter(Boolean);
+        if(!DB.programas[_pid])DB.programas[_pid]=[];
+        _progs.forEach(nombre=>{
+          if(!DB.programas[_pid].find(e=>e.nombre===nombre))
+            DB.programas[_pid].push({id:uid(),nombre,inicio:'',fin:'',activo:true});
+          if(!PROGRAMAS_LIST.includes(nombre))PROGRAMAS_LIST.push(nombre);
+        });
+      }
+    });
+    finishLoad(newData,[]);
+    DB._sheetSource=true;
+    await saveDB();
+    // Mostrar badge de fuente Sheet
+    const badge=document.getElementById('sheetSourceBadge');
+    if(badge) badge.style.display='flex';
+    showToast(`&#128994; ${newData.length} proveedores cargados desde Google Sheet`,'success');
+  } catch(err){
+    showToast('Error: '+err.message,'err');
+    if(st) st.textContent='Error: '+err.message;
+  } finally{
+    if(btn){btn.disabled=false;btn.innerHTML='&#128196; Cargar desde Google Sheet';}
+  }
+}
+
+function ss2(v){ return (v===undefined||v===null||v==='')?'':v.toString().trim(); }
+
+function limpiarFuenteSheet(){
+  DB._sheetSource=false;
+  const badge=document.getElementById('sheetSourceBadge');
+  if(badge) badge.style.display='none';
+  showToast('Ahora puedes cargar desde Excel','success');
+}
+
+// Parser CSV simple que maneja comillas y comas dentro de campos
+function parseCSV(text){
+  const rows=[];
+  const lines=text.split('\n');
+  lines.forEach(line=>{
+    if(!line.trim()) return;
+    const cols=[];
+    let cur='',inQ=false;
+    for(let i=0;i<line.length;i++){
+      const c=line[i];
+      if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else{inQ=!inQ;}}
+      else if(c===','&&!inQ){cols.push(cur);cur='';}
+      else cur+=c;
+    }
+    cols.push(cur);
+    rows.push(cols);
+  });
+  return rows;
+}
+
+// ── EXPORTAR A SHEET + EXCEL ──────────────────────────────────────────────
+async function exportarASheetYExcel(){
+  if(!PROVEEDORES.length){showToast('No hay datos para exportar','warning');return;}
+  const asUrl=DB.gsync?.appsScriptUrl||document.getElementById('gsyncAsUrl')?.value?.trim();
+  // 1. Descargar Excel siempre
+  downloadConsolidado();
+  // 2. Actualizar Sheet si hay Apps Script URL
+  if(!asUrl){
+    showToast('Excel descargado. Para actualizar el Sheet, conecta el Apps Script URL primero.','warning');
+    return;
+  }
+  showToast('Actualizando Google Sheet...','success');
+  try{
+    // Construir datos de proveedores para enviar
+    const headers=['N','NOMBRE CONTACTO','RUT PERSONA','RAZON SOCIAL','NOMBRE FANTASIA',
+      'RUT EMPRESA','LOCALIDAD','DIRECCION','CORREO','FONO',
+      'GIRO 1','GIRO 2','GIRO 3','GIRO 4','DESCRIPCION','INFO SII',
+      'CATEGORIA SII','FACTURAR','ESTADO','AGRUPACION','SERVICIO AM',
+      'HAB SIMPLES','HAB DOBLES','PROGRAMAS'];
+    const rows=PROVEEDORES.map((p,i)=>{
+      const h=DB.hoteles[p._id]||{};
+      const progs=(DB.programas[p._id]||[]).map(e=>e.nombre).join('|');
+      return [
+        i+1, p.nombre_contacto||'', p.rut_persona||'', p.razon_social||'',
+        p.nombre_fantasia||'', p.rut_empresa||'', p.localidad||'',
+        p.direccion||'', p.correo||'', p.fono||'',
+        p.giros[0]||'', p.giros[1]||'', p.giros[2]||'', p.giros[3]||'',
+        p.descripcion||'', p.info_sii||'', p.categoria_sii||'',
+        p.facturar||'', p.estado||'', p.agrupacion||'', p.servicio_am||'',
+        h.simples||0, h.dobles||0, progs
+      ];
+    });
+    const payload={action:'writeProveedores',headers,rows};
+    const resp=await fetch(asUrl,{
+      method:'POST',
+      body:JSON.stringify(payload)
+    });
+    const result=await resp.json();
+    if(result.ok) showToast(`&#9729;&#65039; Sheet actualizado con ${PROVEEDORES.length} proveedores`,'success');
+    else throw new Error(result.error||'Error desconocido');
+  } catch(err){
+    showToast('Sheet no actualizado: '+err.message+' (Excel sí fue descargado)','warning');
+  }
+}
 // ── GOOGLE SHEETS SYNC ─────────────────────────────────────────────────────
 // Usa Google Sheets como base de datos pública vía URL pública
 // El sheet debe tener una celda A1 con el JSON completo de DB
@@ -2998,6 +3174,11 @@ document.addEventListener('DOMContentLoaded', async ()=>{
   }
   // Restaurar tipo de cambio en inputs si ya existen en pantalla
   actualizarUSD();
+  // Restaurar badge si datos vienen del Sheet
+  if(DB._sheetSource){
+    const badge=document.getElementById('sheetSourceBadge');
+    if(badge) badge.style.display='flex';
+  }
 });
 
 // Guardar gsyncId en localStorage cuando se conecte
@@ -3029,13 +3210,28 @@ const _origConectar=conectarGSheet;
   try {
     const data = JSON.parse(e.postData.contents);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = ss.getSheetByName('DB') || ss.insertSheet('DB');
+
+    // Guardar DB (visitas, hoteles, acuerdos, programas)
     if (data.action === 'writeDB') {
+      const sheet = ss.getSheetByName('DB') || ss.insertSheet('DB');
       sheet.getRange('A1').setValue(data.data);
-      return ContentService
-        .createTextOutput(JSON.stringify({ok:true}))
-        .setMimeType(ContentService.MimeType.JSON);
+      return ok();
     }
+
+    // Escribir hoja Proveedores (exportar consolidado)
+    if (data.action === 'writeProveedores') {
+      let sheet = ss.getSheetByName('Proveedores');
+      if (!sheet) sheet = ss.insertSheet('Proveedores');
+      sheet.clearContents();
+      const allRows = [data.headers, ...data.rows];
+      sheet.getRange(1, 1, allRows.length, allRows[0].length).setValues(allRows);
+      // Formato encabezado
+      sheet.getRange(1, 1, 1, data.headers.length)
+        .setBackground('#00778A').setFontColor('#FFFFFF').setFontWeight('bold');
+      return ok();
+    }
+
+    return ok();
   } catch(err) {
     return ContentService
       .createTextOutput(JSON.stringify({ok:false,error:err.message}))
@@ -3050,6 +3246,12 @@ function doGet(e) {
   return ContentService
     .createTextOutput(val)
     .setMimeType(ContentService.MimeType.TEXT);
+}
+
+function ok() {
+  return ContentService
+    .createTextOutput(JSON.stringify({ok:true}))
+    .setMimeType(ContentService.MimeType.JSON);
 }</pre>
       <button onclick="navigator.clipboard.writeText(document.getElementById('gsScriptCode').textContent).then(()=>showToast('Script copiado','success'))" style="padding:7px 16px;background:var(--primary);color:#fff;border:none;border-radius:7px;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">&#128203; Copiar Script</button>
       <div style="margin-top:12px;background:#fff4e0;border-radius:7px;padding:9px 12px;font-size:.78rem;color:#8a5c00">&#9888;&#65039; Google pedir&#225; autorizar permisos la primera vez &mdash; es tu propio script en tu propia cuenta, acepta todo.</div>
