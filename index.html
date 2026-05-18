@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Sistema Proveedores Comunitarios AM · V100 · Región de Antofagasta</title>
+<title>Sistema de Gestión Hotelera · V100 · Región de Antofagasta</title>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
@@ -574,6 +574,32 @@
     font-size:.72rem;color:var(--primary);font-weight:600}
   .card-ncontactos{font-size:.72rem;color:var(--text-muted);font-style:italic}
 
+  /* WHATSAPP BUTTONS */
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    background-color: #25D366;
+    color: white !important;
+    border: none;
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  .btn-whatsapp:hover {
+    background-color: #128C7E;
+  }
+  .btn-whatsapp svg {
+    width: 14px;
+    height: 14px;
+    fill: currentColor;
+  }
+
 </style>
 </head>
 <body>
@@ -586,8 +612,8 @@
     </div>
     <div class="header-divider"></div>
     <div>
-      <div class="header-title">Proveedores Comunitarios AM · <span style="color:var(--primary-mid)">V100</span></div>
-      <div class="header-subtitle">Directorio Regional — Antofagasta Minerals</div>
+      <div class="header-title">Sistema de Gestión Hotelera · <span style="color:var(--primary-mid)">V100</span></div>
+      <div class="header-subtitle">Control de Alojamiento y Reservas — Antofagasta Minerals</div>
     </div>
   </div>
   <div class="header-right">
@@ -602,7 +628,7 @@
 <!-- ═══ NAV TABS v6 ═══════════════════════════════════════════════════════ -->
 <nav class="nav-tabs-main" id="navMain">
   <button class="nav-tab active" onclick="switchPage('directorio',this)" data-page="directorio">
-    &#128269; Directorio
+    &#128269; Alojamientos
   </button>
   <button class="nav-tab" onclick="switchPage('dashboard',this)" data-page="dashboard">
     &#128202; Dashboard
@@ -627,7 +653,7 @@
     <span id="gsyncLabel">Sin conectar</span>
   </div>
   <span style="color:var(--border)">|</span>
-  <span style="color:var(--text-muted)">Google Sheet ID:</span>
+  <span style="color:var(--text-muted)">ID Planilla:</span>
   <input class="gsync-input" id="gsyncId" value="1pJn6oZQI7Ihmtyopdzmna-pO5R0cCGzsjV3NPSpRi3A" style="width:185px;font-size:.7rem" title="Sheet ID">
   <input class="gsync-input" id="gsyncAsUrl" value="https://script.google.com/macros/s/AKfycbzF5mbARNRb7CmSy6w5n7V5jsqENlUy0MaLuh3fdXHfFGS_oEriHhJswAu5ERH3eMkrZA/exec" style="width:290px;font-size:.7rem" title="Apps Script URL">
   <button class="btn-gsync" onclick="conectarGSheet()">Conectar</button>
@@ -665,10 +691,10 @@
 
 <!-- HERO -->
 <div class="hero" id="heroStrip" style="display:none">
-  <h1>Directorio de Proveedores</h1>
-  <p>Registro consolidado y editable de proveedores comunitarios de la Región de Antofagasta.</p>
+  <h1>Directorio de Alojamientos</h1>
+  <p>Registro consolidado y editable de establecimientos hoteleros y alojamientos de la Región de Antofagasta.</p>
   <div class="hero-stats">
-    <div class="hero-stat"><div class="hs-num" id="statTotal">0</div><div class="hs-label">Proveedores</div></div>
+    <div class="hero-stat"><div class="hs-num" id="statTotal">0</div><div class="hs-label">Alojamientos</div></div>
     <div class="hero-stat"><div class="hs-num" id="statFactura">0</div><div class="hs-label">Autorizados</div></div>
     <div class="hero-stat"><div class="hs-num" id="statRubros">0</div><div class="hs-label">Rubros</div></div>
     <div class="hero-stat"><div class="hs-num" id="statLocalidades">0</div><div class="hs-label">Localidades</div></div>
@@ -678,13 +704,13 @@
 
 <!-- NO DATA -->
 <div id="noDataScreen" class="no-data">
-  <div class="nd-icon">📂</div>
+  <div class="nd-icon">🏨</div>
   <h2>Carga los archivos Excel para comenzar</h2>
-  <p>Cada localidad tiene su propio Excel. El buscador los combina y permite editarlos aquí.</p>
+  <p>Cada localidad tiene su propio Excel de alojamientos. El buscador los combina y permite gestionarlos aquí.</p>
   <div class="nd-steps">
-    <div class="nd-step"><div class="nd-num">1</div><p>Descarga la <strong>plantilla</strong> y llena los datos de tu localidad</p></div>
+    <div class="nd-step"><div class="nd-num">1</div><p>Descarga la <strong>plantilla</strong> y llena los datos de los alojamientos</p></div>
     <div class="nd-step"><div class="nd-num">2</div><p>Arrastra los <strong>.xlsx</strong> de todas las localidades</p></div>
-    <div class="nd-step"><div class="nd-num">3</div><p>Edita registros y descarga la <strong>base consolidada</strong></p></div>
+    <div class="nd-step"><div class="nd-num">3</div><p>Gestiona reservas y descarga la <strong>base consolidada</strong></p></div>
   </div>
 </div>
 
@@ -713,14 +739,14 @@
 
     <div class="content">
       <div class="tabs">
-        <div class="tab active" onclick="showTab('directorio',this)">📋 Directorio</div>
+        <div class="tab active" onclick="showTab('directorio',this)">📋 Alojamientos</div>
         <div class="tab" onclick="showTab('estadisticas',this)">📊 Estadísticas</div>
       </div>
 
       <!-- DIRECTORIO -->
       <div id="tab-directorio">
         <div class="results-bar">
-          <div class="results-count">Mostrando <strong id="resultsCount">0</strong> proveedores</div>
+          <div class="results-count">Mostrando <strong id="resultsCount">0</strong> establecimientos</div>
           <div class="view-toggle">
             <button class="view-btn active" id="btnCards" onclick="setView('cards')">▦ Tarjetas</button>
             <button class="view-btn" id="btnTable" onclick="setView('table')">☰ Tabla</button>
@@ -801,6 +827,19 @@
 <div class="toast" id="toast"></div>
 
 <script>
+
+function enviarWhatsApp(telefono, mensaje = "") {
+  if (!telefono) return;
+  // Limpiar el teléfono de caracteres no numéricos excepto el +
+  let cleanPhone = telefono.replace(/[^\d+]/g, "");
+  // Si no tiene el +, y parece ser un número chileno de 9 dígitos, agregar +56
+  if (!cleanPhone.startsWith("+") && cleanPhone.length === 9 && cleanPhone.startsWith("9")) {
+    cleanPhone = "+56" + cleanPhone;
+  }
+  const url = `https://wa.me/${cleanPhone.replace("+", "")}?text=${encodeURIComponent(mensaje)}`;
+  window.open(url, "_blank");
+}
+
 // ── STATE ─────────────────────────────────────────────────────────────────────
 let PROVEEDORES = [];
 
@@ -1274,9 +1313,9 @@ function renderCards(data){
         <div class="card-info">
           ${(()=>{const cs=DB.contactos[p._id]||[];const cp=cs.find(c=>c.principal)||cs[0]||null;
             if(cp) return `<div class='card-info-row'>👤 <span>${esc(cp.nombre)}</span>${cp.cargo?` <span style='font-size:.7rem;color:var(--text-muted)'>· ${esc(cp.cargo)}</span>`:''}</div>`
-              +`${cp.fono?`<div class='card-info-row'>📞 <span>${cp.fono}</span></div>`:''}`
+              +`${cp.fono?`<div class='card-info-row'>📞 <span>${cp.fono}</span> ${cp.fono?`<button class='btn-whatsapp' onclick='event.stopPropagation();enviarWhatsApp("${cp.fono}")'>WhatsApp</button>`:''}</div>`:''}`
               +`${cp.correo?`<div class='card-info-row'>✉ <span style='word-break:break-all'>${cp.correo}</span></div>`:''}`;  
-            return (p.fono?`<div class='card-info-row'>📞 <span>${p.fono}</span></div>`:'')+(p.correo?`<div class='card-info-row'>✉ <span style='word-break:break-all'>${p.correo.split('/')[0].trim()}</span></div>`:'');
+            return (p.fono?`<div class='card-info-row'>📞 <span>${p.fono}</span> <button class='btn-whatsapp' onclick='event.stopPropagation();enviarWhatsApp("${p.fono}")'>WhatsApp</button></div>`:'')+(p.correo?`<div class='card-info-row'>✉ <span style='word-break:break-all'>${p.correo.split('/')[0].trim()}</span></div>`:'');
           })()} 
           ${(()=>{const n=(DB.contactos[p._id]||[]).length;return n>1?`<div class='card-contacts-row'><span class='card-ncontactos'>+${n-1} contacto${n-1>1?'s':''} más</span></div>`:'';})()} 
           ${p.direccion?`<div class="card-info-row">📍 <span>${p.direccion}</span></div>`:''}
@@ -1300,7 +1339,10 @@ function renderTable(data){
       <td style="color:#bbb;font-size:.72rem">${i+1}</td>
       <td><div class="td-name">${name}${p._edited?'<span class="edit-badge">✏</span>':''}</div><div class="td-sub">${name.toLowerCase()!==p.razon_social.toLowerCase()?p.razon_social:''}</div></td>
       <td><span style="font-size:.73rem;background:var(--primary-light);color:var(--primary);padding:2px 6px;border-radius:3px;font-weight:600">${p.localidad}</span></td>
-      <td style="font-size:.76rem">${p.nombre_contacto}</td>
+      <td style="font-size:.76rem">
+        ${p.nombre_contacto}
+        ${p.fono ? `<br><button class='btn-whatsapp' onclick='event.stopPropagation();enviarWhatsApp("${p.fono}")'>WA</button>` : ''}
+      </td>
       <td>${p.rubrosNorm.map(r=>`<span class="giro-tag" style="font-size:.6rem">${r}</span>`).join(' ')}</td>
       <td>${factBadge(p.facturar)}</td>
       <td><span style="font-size:.72rem;color:var(--text-muted)">${p.estado||''}</span></td>`;
@@ -1486,7 +1528,7 @@ function openEditModal(id){
   document.getElementById('modalContent').innerHTML=`
     <div class="modal-header">
       <div>
-        <div class="modal-loc">✏ Editando registro · ${p.localidad}</div>
+        <div class="modal-loc">✏ Editando establecimiento · ${p.localidad}</div>
         <div class="modal-title">${name}</div>
       </div>
       <div class="modal-header-right">
@@ -1599,7 +1641,7 @@ function initCharts(){
   const locs=new Set(PROVEEDORES.map(p=>p.localidad));
   const edited=PROVEEDORES.filter(p=>p._edited).length;
   document.getElementById('kpiGrid').innerHTML=`
-    <div class="kpi"><div class="kpi-num">${PROVEEDORES.length}</div><div class="kpi-label">Total</div></div>
+    <div class="kpi"><div class="kpi-num">${PROVEEDORES.length}</div><div class="kpi-label">Alojamientos</div></div>
     <div class="kpi"><div class="kpi-num">${PROVEEDORES.filter(p=>p.facturar==='Autorizado').length}</div><div class="kpi-label">Autorizados</div></div>
     <div class="kpi"><div class="kpi-num">${locs.size}</div><div class="kpi-label">Localidades</div></div>
     <div class="kpi"><div class="kpi-num">${Object.keys(allR).length}</div><div class="kpi-label">Rubros</div></div>
@@ -2121,7 +2163,7 @@ function renderDashboard(){
   if(!PROVEEDORES.length){ el.innerHTML='<div style="text-align:center;padding:60px;color:var(--text-muted)">Carga proveedores desde el Directorio primero.</div>'; return; }
 
   const hotels=PROVEEDORES.filter(p=>esRubroHotel(p));
-  const totHabs=hotels.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+(h.total||0);},0);
+  const totHabs=hotels.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+((h.simples||0)+(h.dobles||0));},0);
   const totOcup=hotels.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+(h.contratos||[]).reduce((ss,c)=>ss+(parseInt(c.habs)||0),0);},0);
 
   const allVisitas=[];
@@ -2134,17 +2176,18 @@ function renderDashboard(){
   const locHoteles={};
   hotels.forEach(p=>{
     const loc=p.localidad||'Sin loc';
-    const h=DB.hoteles[p._id]||{total:0,contratos:[]};
+    const h=DB.hoteles[p._id]||{simples:0,dobles:0,contratos:[]};
+    const hTotal=(h.simples||0)+(h.dobles||0);
     const ocup=(h.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0);
     if(!locHoteles[loc]) locHoteles[loc]={total:0,ocup:0};
-    locHoteles[loc].total+=(h.total||0);
+    locHoteles[loc].total+=hTotal;
     locHoteles[loc].ocup+=ocup;
   });
 
   el.innerHTML=`
     <div class="dash-title">Dashboard AM <span style="font-size:.82rem;font-weight:400;color:var(--text-muted)">${new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'long',year:'numeric'})}</span></div>
     <div class="dash-stat-big">
-      <div class="stat-big-card"><div class="stat-big-num">${PROVEEDORES.length}</div><div class="stat-big-label">Proveedores</div></div>
+      <div class="stat-big-card"><div class="stat-big-num">${PROVEEDORES.length}</div><div class="stat-big-label">Alojamientos</div></div>
       <div class="stat-big-card"><div class="stat-big-num">${PROVEEDORES.filter(p=>p.facturar==='Autorizado').length}</div><div class="stat-big-label">Autorizados facturar</div></div>
       <div class="stat-big-card">
         <div class="stat-big-num" style="color:var(--green)">${hotels.reduce((s,p)=>{const cv=calcCamas(DB.hoteles[p._id]||{simples:0,dobles:0,contratos:[]});return s+cv.lib_camas;},0)}</div>
@@ -2163,7 +2206,7 @@ function renderDashboard(){
     <div class="dash-grid">
       <div class="dash-card">
         <div class="dash-card-title">Ocupacion Hoteleria por Localidad</div>
-        ${Object.keys(locHoteles).length===0?'<div style="color:var(--text-muted);font-size:.84rem;text-align:center;padding:16px 0">Configura habitaciones en los hoteles para ver estadisticas.</div>':
+        ${Object.keys(locHoteles).length===0 || Object.values(locHoteles).every(d=>d.total===0)?'<div style="color:var(--text-muted);font-size:.84rem;text-align:center;padding:16px 0">Configura habitaciones en los hoteles para ver estadisticas.</div>':
         Object.entries(locHoteles).sort((a,b)=>b[1].total-a[1].total).map(([loc,d])=>{
           const pct=d.total>0?Math.round(d.ocup/d.total*100):0;
           const lib=d.total-d.ocup;
@@ -2207,16 +2250,19 @@ function renderDashboard(){
       </div>
       <div class="dash-card">
         <div class="dash-card-title">Habitaciones por Hotel</div>
-        ${hotels.filter(p=>(DB.hoteles[p._id]||{}).total>0).length===0?'<div style="color:var(--text-muted);font-size:.84rem;text-align:center;padding:16px 0">Abre un hotel y configura sus habitaciones.</div>':
-        hotels.filter(p=>(DB.hoteles[p._id]||{}).total>0).sort((a,b)=>{
-          const ha=DB.hoteles[a._id]||{total:0,contratos:[]};
-          const hb=DB.hoteles[b._id]||{total:0,contratos:[]};
-          return Math.max(0,hb.total-(hb.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0))-Math.max(0,ha.total-(ha.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0));
+        ${hotels.filter(p=>((DB.hoteles[p._id]||{}).simples||0)+((DB.hoteles[p._id]||{}).dobles||0)>0).length===0?'<div style="color:var(--text-muted);font-size:.84rem;text-align:center;padding:16px 0">Abre un hotel y configura sus habitaciones.</div>':
+        hotels.filter(p=>((DB.hoteles[p._id]||{}).simples||0)+((DB.hoteles[p._id]||{}).dobles||0)>0).sort((a,b)=>{
+          const ha=DB.hoteles[a._id]||{simples:0,dobles:0,contratos:[]};
+          const hb=DB.hoteles[b._id]||{simples:0,dobles:0,contratos:[]};
+          const haTotal=(ha.simples||0)+(ha.dobles||0);
+          const hbTotal=(hb.simples||0)+(hb.dobles||0);
+          return Math.max(0,hbTotal-(hb.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0))-Math.max(0,haTotal-(ha.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0));
         }).map(p=>{
           const h=DB.hoteles[p._id];
+          const hTotal=(h.simples||0)+(h.dobles||0);
           const ocup=(h.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0);
-          const lib=Math.max(0,h.total-ocup);
-          const pct=h.total>0?Math.round(ocup/h.total*100):0;
+          const lib=Math.max(0,hTotal-ocup);
+          const pct=hTotal>0?Math.round(ocup/hTotal*100):0;
           const bc=pct>=90?'var(--green)':pct>=60?'var(--orange)':'var(--primary)';
           return `<div class="loc-ocu-row">
             <div class="loc-ocu-name" style="cursor:pointer;color:var(--primary)" onclick="abrirDesde('${p._id}')">${esc(p.nombre_fantasia||p.razon_social||p.nombre_contacto)}</div>
@@ -2235,7 +2281,7 @@ function renderHoteleriaGlobal(){
   if(!el) return;
   if(!PROVEEDORES.length){ el.innerHTML='<div style="text-align:center;padding:60px;color:var(--text-muted)">Carga proveedores desde el Directorio primero.</div>'; return; }
   const hotels=PROVEEDORES.filter(p=>esRubroHotel(p));
-  const totHabs=hotels.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+(h.total||0);},0);
+  const totHabs=hotels.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+((h.simples||0)+(h.dobles||0));},0);
   const totOcup=hotels.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+(h.contratos||[]).reduce((ss,c)=>ss+(parseInt(c.habs)||0),0);},0);
 
   const porLoc={};
@@ -2250,7 +2296,7 @@ function renderHoteleriaGlobal(){
     </div>
     ${hotels.length===0?'<div style="text-align:center;padding:40px;color:var(--text-muted)">No hay proveedores de rubro hotelero cargados.</div>':''}
     ${Object.entries(porLoc).sort((a,b)=>a[0].localeCompare(b[0])).map(([loc,provs])=>{
-      const lT=provs.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+(h.total||0);},0);
+      const lT=provs.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+((h.simples||0)+(h.dobles||0));},0);
       const lO=provs.reduce((s,p)=>{const h=DB.hoteles[p._id]||{};return s+(h.contratos||[]).reduce((ss,c)=>ss+(parseInt(c.habs)||0),0);},0);
       const pct=lT>0?Math.round(lO/lT*100):0;
       return `<div class="dash-card" style="margin-bottom:16px">
@@ -2260,17 +2306,18 @@ function renderHoteleriaGlobal(){
         </div>
         ${lT>0?`<div class="ocupacion-bar"><div class="ocupacion-fill ${pct>=90?'full':pct>=70?'warn':''}" style="width:${pct}%"></div></div><div style="text-align:right;font-size:.72rem;color:var(--text-muted);margin-bottom:12px">${pct}% ocupacion</div>`:''}
         ${provs.map(p=>{
-          const h=DB.hoteles[p._id]||{total:0,contratos:[]};
+          const h=DB.hoteles[p._id]||{simples:0,dobles:0,contratos:[]};
+          const hTotal=(h.simples||0)+(h.dobles||0);
           const ocup=(h.contratos||[]).reduce((s,c)=>s+(parseInt(c.habs)||0),0);
-          const lib=Math.max(0,(h.total||0)-ocup);
-          const pctP=h.total>0?Math.round(ocup/h.total*100):0;
+          const lib=Math.max(0,hTotal-ocup);
+          const pctP=hTotal>0?Math.round(ocup/hTotal*100):0;
           const bc=pctP>=90?'var(--green)':pctP>=60?'var(--orange)':'var(--primary)';
           return `<div style="border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:8px;background:var(--bg2)">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
               <div style="font-weight:600;font-size:.87rem;cursor:pointer;color:var(--primary)" onclick="abrirDesde('${p._id}')">${esc(p.nombre_fantasia||p.razon_social||p.nombre_contacto)}</div>
-              ${h.total===0?'<span style="font-size:.73rem;color:var(--text-muted)">Sin configurar</span>':`<span style="font-size:.82rem"><b style="color:var(--green)">${lib}</b><span style="color:var(--text-muted)"> lib / ${h.total}</span></span>`}
+              ${hTotal===0?'<span style="font-size:.73rem;color:var(--text-muted)">Sin configurar</span>':`<span style="font-size:.82rem"><b style="color:var(--green)">${lib}</b><span style="color:var(--text-muted)"> lib / ${hTotal}</span></span>`}
             </div>
-            ${h.total>0?`<div class="ocupacion-bar" style="height:5px"><div class="ocupacion-fill ${pctP>=90?'full':pctP>=60?'warn':''}" style="width:${pctP}%;background:${bc}"></div></div>`:''}
+            ${hTotal>0?`<div class="ocupacion-bar" style="height:5px"><div class="ocupacion-fill ${pctP>=90?'full':pctP>=60?'warn':''}" style="width:${pctP}%;background:${bc}"></div></div>`:''}
             ${(h.contratos||[]).length>0?`<div style="margin-top:8px">${h.contratos.map(c=>`<div style="display:flex;justify-content:space-between;font-size:.77rem;padding:3px 0;border-bottom:1px solid var(--border)"><span>${esc(c.cliente)}</span><span style="font-weight:700;color:var(--primary)">${c.habs} hab.</span><span style="color:var(--text-muted)">${c.desde?c.desde.slice(5):''}${c.hasta?' - '+c.hasta.slice(5):''}</span></div>`).join('')}</div>`:''}
             <button onclick="abrirDesde('${p._id}','hoteleria')" style="margin-top:8px;font-size:.75rem;padding:4px 10px;border:1px solid var(--primary);background:none;color:var(--primary);border-radius:5px;cursor:pointer">Gestionar</button>
           </div>`;
@@ -2414,6 +2461,7 @@ function renderHoteleriaModal(id){
           <span>${ct.habs} hab. · ${ct.habs*(ct.tipo==='doble'?2:1)} camas</span>
           ${ct.desde?`<span>${ct.desde}${ct.hasta?' → '+ct.hasta:''}</span>`:''}
           ${dias>0?`<span>${dias} días</span>`:''}
+          ${ct.fono ? `<div style="margin-top:4px"><button class='btn-whatsapp' onclick='enviarWhatsApp("${ct.fono}", "Hola ${esc(ct.cliente)}, confirmamos tu reserva de ${ct.habs} habitación(es) ${ct.tipo} desde el ${ct.desde} hasta el ${ct.hasta}.")'>Confirmar WhatsApp</button></div>` : ''}
         </div>
         ${monto>0?`<div class="contrato-card-monto">${fmtClp(monto)} · ${fmtUsd(monto/t.tc)}</div>`:''}
       </div>`;
@@ -2435,6 +2483,7 @@ function renderHoteleriaModal(id){
           </select>
         </div>
         <input type="text" id="fc_cli_${id}" placeholder="Empresa / Cliente" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:.87rem;margin-bottom:8px;outline:none">
+        <input type="text" id="fc_tel_${id}" placeholder="Teléfono del Huésped / Contacto" style="width:100%;border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:.87rem;margin-bottom:8px;outline:none">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
         <div><label style="font-size:.72rem;color:var(--text-muted)">N° hab.</label><br>
@@ -2502,9 +2551,10 @@ async function guardarContrato(id){
   const habs=parseInt(document.getElementById('fc_habs_'+id)?.value)||0;
   const desde=document.getElementById('fc_desde_'+id)?.value||'';
   const hasta=document.getElementById('fc_hasta_'+id)?.value||'';
+  const fono=document.getElementById('fc_tel_'+id)?.value||'';
   if(!cli.trim()||!habs){showToast('Completa cliente y N° habitaciones','err');return;}
   if(!DB.hoteles[id]) DB.hoteles[id]={simples:0,dobles:0,contratos:[]};
-  DB.hoteles[id].contratos.push({id:uid(),tipo,cliente:cli.trim(),amsa,habs,desde,hasta});
+  DB.hoteles[id].contratos.push({id:uid(),tipo,cliente:cli.trim(),amsa,habs,desde,hasta,fono});
   await saveDB();
   _tipoHab[id]='simple';
   document.getElementById('fc_'+id).style.display='none';
@@ -3460,7 +3510,7 @@ function renderContactosInline(pid){
       ${c.cargo?`<div class="contacto-cargo">${esc(c.cargo)}</div>`:''}
       <div class="contacto-info">
         ${c.rut?`<span>🪪 ${esc(c.rut)}</span>`:''}
-        ${c.fono?`<span>📞 ${esc(c.fono)}</span>`:''}
+        ${c.fono?`<span>📞 ${esc(c.fono)}</span> <button class='btn-whatsapp' onclick='enviarWhatsApp("${c.fono}")'>WhatsApp</button>`:''}
         ${c.correo?`<span>✉ <a href="mailto:${esc(c.correo)}">${esc(c.correo)}</a></span>`:''}
       </div>
     </div>
